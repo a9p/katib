@@ -105,6 +105,9 @@ docker build --platform "linux/$ARCH" -t "${REGISTRY}/suggestion-enas:${TAG}" -f
 echo -e "\nBuilding DARTS suggestion...\n"
 docker build --platform "linux/$ARCH" -t "${REGISTRY}/suggestion-darts:${TAG}" -f ${CMD_PREFIX}/suggestion/nas/darts/${VERSION}/Dockerfile .
 
+echo -e "\nBuilding PBT suggestion...\n"
+docker build --platform "linux/$ARCH" -t "${REGISTRY}/suggestion-pbt:${TAG}" -f ${CMD_PREFIX}/suggestion/pbt/${VERSION}/Dockerfile .
+
 # Early stopping images
 echo -e "\nBuilding early stopping images...\n"
 
@@ -135,6 +138,9 @@ else
 
   echo -e "\nBuilding PyTorch CIFAR-10 CNN training container example for DARTS...\n"
   docker build --platform linux/amd64 -t "${REGISTRY}/darts-cnn-cifar10:${TAG}" -f examples/${VERSION}/trial-images/darts-cnn-cifar10/Dockerfile .
+
+  echo -e "\nBuilding dynamic learning rate training container example for PBT...\n"
+  docker build --platform linux/amd64 -t "${REGISTRY}/simple-pbt:${TAG}" -f examples/${VERSION}/trial-images/pbt/Dockerfile .
 
 fi
 
