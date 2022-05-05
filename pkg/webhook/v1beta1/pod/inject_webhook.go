@@ -172,7 +172,7 @@ func (s *SidecarInjector) Mutate(pod *v1.Pod, namespace string) (*v1.Pod, error)
 
 	mountPath, pathKind := getMountPath(trial.Spec.MetricsCollector)
 	if mountPath != "" {
-		if err = mutateVolume(mutatedPod, mountPath, injectContainer.Name, trial.Spec.PrimaryContainerName, pathKind); err != nil {
+		if err = mutateMetricsCollectorVolume(mutatedPod, mountPath, injectContainer.Name, trial.Spec.PrimaryContainerName, pathKind); err != nil {
 			return nil, err
 		}
 	}
@@ -381,20 +381,16 @@ func (s *SidecarInjector) mutateSuggestionVolume(pod *v1.Pod, primaryContainerNa
 		SubPath:   checkpointFolder,
 	}
 
-	primaryContainerIndex := -1
-	for i, c := range pod.Spec.Containers {
-		if c.Name == trial.Spec.PrimaryContainerName {
-			primaryContainerIndex = i
-			break
-		}
+	primaryContainerIndex := getPrimaryContainerIndex(pod.Spec.Containers, trial.Spec.PrimaryContainerName)
+	if err := addContainerVolumeMount(&pod.Spec.Containers[primaryContainerIndex], &vm); err != nil {
+		return err
 	}
-
-	c := &pod.Spec.Containers[primaryContainerIndex]
-	if c.VolumeMounts == nil {
-		c.VolumeMounts = make([]v1.VolumeMount, 0)
-	}
-	c.VolumeMounts = append(c.VolumeMounts, vm)
-	pod.Spec.Containers[primaryContainerIndex] = *c
+	// c := &pod.Spec.Containers[primaryContainerIndex]
+	// if c.VolumeMounts == nil {
+	// 	c.VolumeMounts = make([]v1.VolumeMount, 0)
+	// }
+	// c.VolumeMounts = append(c.VolumeMounts, vm)
+	// pod.Spec.Containers[primaryContainerIndex] = *c
 
 	pod.Spec.Volumes = append(pod.Spec.Volumes, suggestionVolume)
 
