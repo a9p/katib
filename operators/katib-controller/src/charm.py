@@ -195,7 +195,6 @@ class Operator(CharmBase):
                         for f, suffix in (
                             ("defaultTrialTemplate", ".yaml"),
                             ("enasCPUTemplate", ""),
-                            ("pbtTemplate", ""),
                             ("pytorchJobTemplate", ""),
                         )
                     },
