@@ -127,9 +127,15 @@ func (g *General) SyncAssignments(
 		logger.Error(err, "The response contains unexpected trials")
 		return err
 	}
-	if responseSuggestion.Annotations != nil && len(responseSuggestion.Annotations) != len(responseSuggestion.ParameterAssignments) {
+	if responseSuggestion.Annotations != nil && len(responseSuggestion.Annotations) != currentRequestNum {
 		err := fmt.Errorf("The response contains unexpected annotations")
 		logger.Error(err, "The response contains unexpected annotations")
+		return err
+	}
+
+	if responseSuggestion.TrialNames != nil && len(responseSuggestion.TrialNames) != currentRequestNum {
+		err := fmt.Errorf("The response contains unexpected trial names")
+		logger.Error(err, "The response contains unexpected trial names")
 		return err
 	}
 
@@ -176,8 +182,15 @@ func (g *General) SyncAssignments(
 
 	trialAssignments := []suggestionsv1beta1.TrialAssignment{}
 	for n, t := range responseSuggestion.ParameterAssignments {
+		var trialName string
+		if responseSuggestion.TrialNames != nil {
+			trialName = responseSuggestion.TrialNames[n]
+		} else {
+			trialName = fmt.Sprintf("%s-%s", instance.Name, utilrand.String(8))
+		}
+
 		assignment := suggestionsv1beta1.TrialAssignment{
-			Name:                 fmt.Sprintf("%s-%s", instance.Name, utilrand.String(8)),
+			Name:                 trialName,
 			ParameterAssignments: composeParameterAssignments(t.Assignments),
 			EarlyStoppingRules:   earlyStoppingRules,
 		}

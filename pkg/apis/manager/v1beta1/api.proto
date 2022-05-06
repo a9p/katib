@@ -313,7 +313,10 @@ message GetSuggestionsReply {
     AlgorithmSpec algorithm = 2;
     repeated EarlyStoppingRule early_stopping_rules = 3;
 
-    repeated Annotations annotations = 4;
+    // Optional field to override the trial names
+    repeated string trial_names = 4; 
+    // Optional field to add annotations to the generated Trials
+    repeated Annotations annotations = 5;
 }
 
 message ValidateAlgorithmSettingsRequest {
